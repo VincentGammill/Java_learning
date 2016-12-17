@@ -1,11 +1,12 @@
 package simplecalculatorapp;
 
-import java.util.Scanner;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
+import java.util.Scanner;
+import java.util.LinkedList;
 import java.util.Objects;
 import static java.lang.String.format;
 
@@ -14,7 +15,6 @@ public class RPNCalculatorApp {
 	
 	private static final Set<String> EXIT_COMMANDS;
 	private static final Set<String> HELP_COMMANDS;
-	private static final Set<String> OPERATIONS;
 	private static final String HELP_MESSAGE;
 	
 	/*
@@ -38,28 +38,13 @@ public class RPNCalculatorApp {
         hcmds.addAll(Arrays.asList("help", "?"));
         HELP_COMMANDS = Collections.unmodifiableSet(hcmds);
         
-        final SortedSet<String> ops = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-        ops.addAll(Arrays.asList("+", "-", "*", "/", "^"));
-        OPERATIONS = Collections.unmodifiableSortedSet(ops);
-        
         HELP_MESSAGE = format("You're using a very simple calculator! " +
         		"" +
         		"\nPlease enter a computation in Reverse Polish Notation" +
         		"\nor enter one of the following commands to exit %s", EXIT_COMMANDS);
     }
 	
-
-	public static boolean isValidOperator(char maybeOperator) {
-		if (OPERATIONS.contains( maybeOperator )) {
-			return true;
-		}
-		else { 
-			return false;
-		}
-	}
-	
-    private static void output(final String format, final Object... args)
-    {
+    private static void output(final String format, final Object... args) {
         System.out.println(format(format, args));
     }
 	
@@ -67,81 +52,42 @@ public class RPNCalculatorApp {
         
 		final Calculator calc = new Calculator();
 		final Scanner scan = new Scanner(System.in);
+		final StringBuilder sendToTokenizer = new StringBuilder();
         output(HELP_MESSAGE);
-        while (scan.hasNext())
-        {
-            if (scan.hasNextInt())
-            {
-                final double next = scan.nextInt();
-                calc.add(next);
-            }
-            else if (scan.hasNextLong())
-            {
-                final double next = scan.nextLong();
-                calc.add(next);
-            }
-            else if (scan.hasNextDouble())
-            {
-                final double next = scan.nextDouble();
-                calc.add(next);
-            }
-            
-            else if (scan.hasNextBoolean())
-            {
-                final boolean nextBool = scan.nextBoolean();
-                final double next = nextBool ? 1.0 : 0;
-                calc.add(next);
-            }
-            
-            /*
-             * Currently no plan for what to do with BigIntegers...
-             * but the calculator currently just tells the user and
-             * politely ignores them.
-             */
-            
-            //else if (scan.hasNext("\\d+")) {
-            //	final BigInteger nextBigInt = scan.nextBigInteger();
-            //	output("You entered a BigInteger: %s", nextBigInt);
-            //}
-            
-   
-            else // not a number
-            {
-                final String next = scan.next();
-             
-                if (EXIT_COMMANDS.contains(next)) {
-                        output("Exit command %s issued, exiting!", next);
-                        break;
+        
+        while (scan.hasNext()) {
+        	final String userIn = scan.next();
+        	
+        	if (EXIT_COMMANDS.contains(userIn)) {
+        		output("Exit command %s issued, exiting!", userIn);
+        		break;
                 }
-                else if (HELP_COMMANDS.contains(next)) { 
-                	output(HELP_MESSAGE); 
-                }
-                else if (OPERATIONS.contains(next)) {
-                	calc.operate(next);
-
-                }  
-                else if ( Objects.equals( next, "=") ) {
-                	final double result = calc.print();
-                	output("The answer is: %f", result); 
-                }
-                // unclassified
-                
-                else { 
-                	output("You entered an unclassified String: %s", next); 
-                }
-            }
-
+        	else if (HELP_COMMANDS.contains(userIn)) { 
+        		output(HELP_MESSAGE); 
+        	}
+        	else {
+        		sendToTokenizer.append(userIn);
+        	}  
+        	
+        	if ( Objects.equals( userIn, "=") ) {
+        		//System.out.println( sendToTokenizer.toString() );
+        		final Tokenizer tokenizer = new Tokenizer( sendToTokenizer.toString() );
+        		LinkedList<Token> mathTokens = tokenizer.getTokens();
+        		for (Token i : mathTokens) {
+        			System.out.println( String.valueOf( i.getValue() ) );
+        		}
+        		// TODO send the LinkedList of tokens  to a shunting yard algorithm which converts
+        		// TODO infix into RPN, and then to a RPN calculator for computation. Return result of
+        		// TODO computation here.
+        	}
         }
-		
-		
-
+        scan.close();
+        System.exit(0);
+        
         /*   This will close the underlying Readable, in this case System.in, and free those resources.
          *   You will not be to read from System.in anymore after this you call .close().
          *   If you wanted to use System.in for something else, then don't close the Scanner.
          */  
-
-     scan.close();
-     System.exit(0);
+        
 	}
-
 }

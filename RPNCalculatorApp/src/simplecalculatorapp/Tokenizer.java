@@ -13,14 +13,14 @@ import java.util.LinkedList;
 
 class Tokenizer {
 	
-	private static final Set<String> OPERATIONS;
+	private static final Set<Character> OPERATIONS;
     private String input;
     private LinkedList<Token> tokens = new LinkedList<Token>();
     
     static {		
     	// this is a static block, executed when class is loaded into JVM. Huh.
-    	final SortedSet<String> ops = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-        ops.addAll( Arrays.asList("+", "-", "*", "/", "^") );
+    	final SortedSet<Character> ops = new TreeSet<Character>();
+        ops.addAll( Arrays.asList('+', '-', '*', '/', '^') );
         OPERATIONS = Collections.unmodifiableSortedSet(ops);
     }
     
