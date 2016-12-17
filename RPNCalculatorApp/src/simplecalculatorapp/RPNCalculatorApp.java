@@ -1,12 +1,12 @@
 package simplecalculatorapp;
 
+import java.util.Deque;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Scanner;
-import java.util.LinkedList;
 import java.util.Objects;
 import static java.lang.String.format;
 
@@ -18,6 +18,9 @@ public class RPNCalculatorApp {
 	private static final String HELP_MESSAGE;
 	
 	/*
+	 * Adapted from 
+	 * http://stackoverflow.com/a/26446609
+	 * 
 	 * Notes to self: SortedSet is an interface, TreeSet is a class that implements 
 	 * that interface. "String.CASE_INSENSITIVE_ORDER" is a comparator for the TreeSet 
 	 * ecmds, which is created empty.
@@ -72,7 +75,7 @@ public class RPNCalculatorApp {
         	if ( Objects.equals( userIn, "=") ) {
         		//System.out.println( sendToTokenizer.toString() );
         		final Tokenizer tokenizer = new Tokenizer( sendToTokenizer.toString() );
-        		LinkedList<Token> mathTokens = tokenizer.getTokens();
+        		Deque<Token> mathTokens = tokenizer.getTokens();
         		for (Token i : mathTokens) {
         			System.out.println( String.valueOf( i.getValue() ) );
         		}

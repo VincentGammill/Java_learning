@@ -3,19 +3,20 @@ package simplecalculatorapp;
 //code borrowed from and inspired by Heletek at https://gist.github.com/heletek
 
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.TreeSet;
 import java.util.SortedSet;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
-import java.util.LinkedList;
 
 
 class Tokenizer {
 	
 	private static final Set<Character> OPERATIONS;
     private String input;
-    private LinkedList<Token> tokens = new LinkedList<Token>();
+    private Deque<Token> tokens = new ArrayDeque<Token>();
     
     static {		
     	// this is a static block, executed when class is loaded into JVM. Huh.
@@ -29,7 +30,7 @@ class Tokenizer {
     	this.input = input;
     }
     
-    public LinkedList<Token> getTokens()
+    public Deque<Token> getTokens()
     {
         StringBuilder currentlyBuilt = new StringBuilder();
         TokenType lastType = null;
@@ -59,26 +60,30 @@ class Tokenizer {
             
             if (checkForOthers)
             {
-	            if (currentChar == ')')
+	            if (currentChar == ')') {
 	            	lastType = TokenType.RIGHT_PARENTHESIS;
+	            }
 	            else if (currentChar == '(') {
 	            	lastType = TokenType.LEFT_PARENTHESIS;
 	            }
-	            else if (OPERATIONS.contains(currentChar))
+	            else if (OPERATIONS.contains(currentChar)) {
 	                lastType = TokenType.OPERATOR;
-	            else if (currentChar == '=')
+	            }
+	            else if (currentChar == '=') {
 	            	lastType = TokenType.EQUALS;
-	            else
+	            }
+	            else {
 	            	lastType = TokenType.UNKNOWN;
+	            }
 
-	            tokens.add(new Token(currentChar, lastType));
+	            tokens.addLast(new Token(currentChar, lastType));
             }
             
             checkForOthers = true;
         }
         
         if (currentlyBuilt.length() > 0)
-            tokens.add(new Token(currentlyBuilt.toString(), TokenType.NUMBER));
+            tokens.addLast(new Token(currentlyBuilt.toString(), TokenType.NUMBER));
         
         return tokens;
     }
