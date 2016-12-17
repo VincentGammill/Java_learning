@@ -1,0 +1,16 @@
+
+Stage 1
+1) Can add, subtract, divide, and multiply two numbers (integers or floats). [ACCOMPLISHED]
+
+2) Can parse an arbitrary number of operations [ACCOMPLISHED -- Implemented Reverse Polish Notation]
+
+3) Can parse parentheses.
+
+3) Outputs result to console [ACCOMPLISHED]
+
+4) On run, prompts user input and supplies information required to quit (type "exit", for instance). [ACCOMPLISHED]
+
+
+
+Stage 2
+1) Comes with a GUI.
