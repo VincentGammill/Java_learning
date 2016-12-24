@@ -21,7 +21,7 @@ public class Token {
 		this.value = String.valueOf(value);
 	}
 	
-	public TokenType getToken() {
+	public TokenType getType() {
 		return type;
 	}
 	
@@ -50,8 +50,10 @@ public class Token {
                     return -1;
             }
         }
+
         else if (type == TokenType.RIGHT_PARENTHESIS || type == TokenType.LEFT_PARENTHESIS)
             return 4;
+
         
         return -1;
     }

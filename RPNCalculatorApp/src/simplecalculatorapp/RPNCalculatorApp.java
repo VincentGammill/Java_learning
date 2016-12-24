@@ -43,7 +43,7 @@ public class RPNCalculatorApp {
         
         HELP_MESSAGE = format("You're using a very simple calculator! " +
         		"" +
-        		"\nPlease enter a computation in Reverse Polish Notation" +
+        		"\nPlease enter an expression followed by '=' " +
         		"\nor enter one of the following commands to exit %s", EXIT_COMMANDS);
     }
 	
@@ -52,8 +52,7 @@ public class RPNCalculatorApp {
     }
 	
 	public static void main(String[] args) {
-        
-		final Calculator calc = new Calculator();
+
 		final Scanner scan = new Scanner(System.in);
 		final StringBuilder sendToTokenizer = new StringBuilder();
         output(HELP_MESSAGE);
@@ -73,12 +72,22 @@ public class RPNCalculatorApp {
         	}  
         	
         	if ( Objects.equals( userIn, "=") ) {
-        		//System.out.println( sendToTokenizer.toString() );
         		final Tokenizer tokenizer = new Tokenizer( sendToTokenizer.toString() );
         		Deque<Token> mathTokens = tokenizer.getTokens();
+        		
+        		final PostfixGenerator pfg = new PostfixGenerator();
+        		mathTokens = pfg.getPostfix( mathTokens );
+        		/*
         		for (Token i : mathTokens) {
         			System.out.println( String.valueOf( i.getValue() ) );
         		}
+        		*/
+
+        		final Calculator calc = new Calculator( mathTokens );
+        		calc.calculate();
+        		output("The answer is: %f", calc.answerMe() );
+        		sendToTokenizer.delete( 0 , sendToTokenizer.length() );
+        		
         		// TODO send the LinkedList of tokens  to a shunting yard algorithm which converts
         		// TODO infix into RPN, and then to a RPN calculator for computation. Return result of
         		// TODO computation here.

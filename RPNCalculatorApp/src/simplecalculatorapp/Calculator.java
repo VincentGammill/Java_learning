@@ -14,59 +14,38 @@ import java.util.Deque;
  */
 
 public class Calculator {
+	/*
+	 * numbers is where the calculator puts doubles to hold for calculations.
+	 */
+	private final Deque<Double> numbers = new ArrayDeque<Double>(); 
+	private final Deque<Token> postfixDeque;
+	private int numCount = 0; 		// Counter for the Stack so constantly checking if empty
+	private int postfixCount;
 	
-	private final Deque<Double> numbers = new ArrayDeque<Double>(); // This is where the calculator stores numbers
-	private byte countStack = 0; 		// A counter for the Stack so I'm not constantly whether it's empty or not.
-	
-	public Calculator( ) {
-		/*
-		 * Empty constructor for now...not sure what, if anything, should go here.
-		 * One possibility: rewrite this class so that it extends ArrayDeque??
-		 */
+	public Calculator( Deque<Token> postfixDeque ) {
+		this.postfixDeque = postfixDeque;
+		this.postfixCount = postfixDeque.size();
 	}
 	
-	//A method to pass the Calculator a double for it to stick on top of the Stack.
-	public void add( final double d) {
-		numbers.addFirst( d );
-		countStack++;   // Must increment countStack!
+	/*
+	 * A little method to store the number value of a token
+	 */
+	
+	public void clearMem() {
+		numbers.clear();
+		postfixDeque.clear();
+		numCount = 0;
+		postfixCount = 0;
 	}
 	
-	public void operate( final String s) {
-		final String operation = s;	// The string representing the binary operation to be performed
-		if (countStack >= 2) {
-	    	double numA = 0;  // The leading number in a binary arithmetic operation
-	    	double numB = 0;  // The final number in a binary arithmetic operation
-			numA = numbers.removeFirst();
-			numB = numbers.removeFirst();
-        	switch (operation) {
-    		case "+":
-    			numbers.addFirst( numA + numB );
-    			break;
-    		case "-":
-    			numbers.addFirst( numB - numA );	// order is important here! Reading left-to-right means
-    			break;								// that the 2nd number popped from Stack is the 1st number
-    		case "*":								// in the subtract operation.
-    			numbers.addFirst( numA * numB );
-    			break;
-    		case "/":
-    			numbers.addFirst( numA / numB );
-    			break;
-        	}
-    		countStack--;   // All binary operations reduce the Stack count by 1
-		}
-		else {
-			/* The user input was screwed up or the Scanner logic is screwed up. Either way,
-			 * just start the calculator over.
-			 */
-			numbers.clear();
-			countStack = 0;
-			System.out.println("Error: not enough numbers on the stack.");
-		}
-
+	private void store(Token numberToken) {
+		numbers.addFirst( Double.parseDouble( numberToken.getValue() ) );	
+		numCount++;
+		//System.out.println("Number " + numberToken.getValue() + " added to number stack");
 	}
 	
-	public double print() {
-		if (countStack > 0 ) {
+	public double answerMe() {
+		if (numCount > 0 ) {
 			double result = numbers.removeFirst();
 			
 			/*
@@ -76,14 +55,62 @@ public class Calculator {
 			 */
 			
 			numbers.clear();
-			numbers.addFirst(result);
-			countStack = 1;
+			numCount = 0;
 			return result;
 		}
 		else return 0;
 	}
-
-
 	
+	public void calculate() {
+		while(postfixCount > 0) {
+			Token currToken = postfixDeque.removeLast();
+			postfixCount--;
+			if ( currToken.getType() == TokenType.NUMBER ) {
+				store(currToken);
+			}
+			else if (currToken.getType() == TokenType.OPERATOR ) {
+				operate( currToken.getValue() );
+				// TODO remove this: System.out.println("Operation \'" + currToken.getValue() + "\' performed");
+			}
+			// TODO if it's not a number or operator, should do something to warn user
+		}
+	}
+	/*
+	 * A method that performs a single (binary) operation and pushes the resulting
+	 * number back onto the numbers Deque.
+	 */
+	public void operate( final String s ) {
+		final String operation = s;	// The string representing the binary operation to be performed
+		if (numCount >= 2) {
+			double numA = numbers.removeFirst();
+			double numB = numbers.removeFirst();
+			switch (operation) {
+				case "+":
+					numbers.addFirst( numA + numB );
+					break;
+    		case "-":
+    			numbers.addFirst( numB - numA );	// order is important here! Reading left-to-right means
+    			break;								// that the 2nd number popped from Stack is the 1st number
+    		case "*":								// in the subtract operation.
+    			numbers.addFirst( numA * numB );
+    			break;
+    		case "/":
+    			numbers.addFirst( numB / numA );
+    			break;
+    		case "^":
+    			numbers.addFirst( Math.pow(numB, numA));
+			}
+    		numCount--;   // All binary operations reduce the Stack count by 1
+		}
+		else {
+			/* The user input was screwed up or the Scanner logic is screwed up. Either way,
+			 * just start the calculator over.
+			 */
+			numbers.clear();
+			numCount = 0;
+			System.out.println("Error: not enough numbers on the stack.");
+		}
 
+	}
+	
 }
